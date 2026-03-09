@@ -278,7 +278,8 @@ body {
   display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
 .price-cols { flex: 1; display: flex; }
-.price-col { flex: 1; padding: 11px 12px; display: flex; flex-direction: column; gap: 2px; }
+.price-col { flex: 1; padding: 11px 12px; display: flex; flex-direction: column; gap: 2px; cursor: pointer; transition: background 0.15s; }
+.price-col:active { background: rgba(200,169,110,0.15); }
 .price-col + .price-col { border-left: 1px solid rgba(200,169,110,0.2); }
 .col-lbl { font-size: 0.58rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
 .col-price { font-size: 1.2rem; font-weight: 700; letter-spacing: -0.5px; }
@@ -682,11 +683,11 @@ function renderPrices() {
         <div class="price-item" style="animation-delay:${i*0.018}s">
           <div class="size-badge">${s.size}</div>
           <div class="price-cols">
-            <div class="price-col">
+            <div class="price-col" onclick="copyPrice('${currentWood}','${s.size}','plain',${Math.round(s.plain)})">
               <div class="col-lbl">ธรรมดา</div>
               <div class="col-price">${Math.round(s.plain)}<span class="u"> บาท</span></div>
             </div>
-            <div class="price-col">
+            <div class="price-col" onclick="copyPrice('${currentWood}','${s.size}','groove',${Math.round(s.groove)})">
               <div class="col-lbl">${d.grooveLabel}</div>
               <div class="col-price">${Math.round(s.groove)}<span class="u"> บาท</span></div>
               <div class="col-diff">+${diff} บาท</div>
@@ -714,6 +715,14 @@ function renderPrices() {
     });
   }
   list.innerHTML = html;
+}
+
+//Copy price
+  function copyPrice(wood, size, type, price) {
+  const msg = type === 'plain'
+    ? `${wood} ขนาด ${size} ราคา ${price} บาท`
+    : `${wood} ฝ้าย ขนาด ${size} ราคา ${price} บาท`;
+  navigator.clipboard.writeText(msg).then(() => showToast(`📋 คัดลอกแล้ว: ${msg}`));
 }
 
 // ── Toast ────────────────────────────────────────────────────────────

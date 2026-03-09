@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#1a1209">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="กรอบไม้">
+<title>ราคากรอบไม้</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+:root {
+  --ink: #1a1209;
+  --grain: #f2e8d9;
+  --card: #fffcf6;
+  --wood: #c8a96e;
+  --wood-dark: #7a5c10;
+  --muted: #8a7560;
+  --accent: #2d6a3f;
+  --radius: 16px;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+html, body {
+  height: 100%; overflow: hidden;
+  overscroll-behavior: none;
+}
+
+body {
+  font-family: 'Sarabun', sans-serif;
+  background: var(--grain);
+  color: var(--ink);
+  position: fixed; width: 100%; height: 100%;
+  background-image:
+    repeating-linear-gradient(90deg, transparent, transparent 48px, rgba(180,140,80,0.03) 48px, rgba(180,140,80,0.03) 49px),
+    repeating-linear-gradient(180deg, transparent, transparent 64px, rgba(180,140,80,0.03) 64px, rgba(180,140,80,0.03) 65px);
+}
+
+/* ── SCREENS ── */
+.screen {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  transition: transform 0.32s cubic-bezier(0.4,0,0.2,1), opacity 0.32s;
+  will-change: transform;
+  background: var(--grain);
+  background-image: inherit;
+}
+.screen.slide-right  { transform: translateX(100%); pointer-events: none; }
+.screen.slide-left   { transform: translateX(-28%); opacity: 0.45; pointer-events: none; }
+
+/* ── HEADER ── */
+.app-header {
+  background: var(--ink);
+  padding: calc(14px + var(--safe-top)) 16px 12px;
+  flex-shrink: 0;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.28);
+  z-index: 10;
+}
+.header-row { display: flex; align-items: center; gap: 10px; min-height: 40px; }
+.back-btn {
+  width: 36px; height: 36px;
+  background: rgba(255,255,255,0.1); border: none; border-radius: 10px;
+  color: var(--wood); font-size: 1.2rem; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: background 0.15s;
+}
+.back-btn:active { background: rgba(255,255,255,0.22); }
+.header-text { flex: 1; min-width: 0; }
+.header-brand {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.9rem; letter-spacing: 2px;
+  color: var(--wood); line-height: 1;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.header-sub {
+  font-size: 0.73rem; color: rgba(242,232,217,0.48);
+  font-weight: 300; margin-top: 1px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.search-wrap { margin-top: 10px; position: relative; }
+.search-wrap input {
+  width: 100%; padding: 10px 14px 10px 38px;
+  border-radius: 10px; border: none;
+  background: rgba(255,255,255,0.1); color: var(--grain);
+  font-family: 'Sarabun', sans-serif; font-size: 0.95rem; outline: none;
+  transition: background 0.2s;
+}
+.search-wrap input:focus { background: rgba(255,255,255,0.16); }
+.search-wrap input::placeholder { color: rgba(242,232,217,0.32); }
+.s-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); opacity: 0.38; font-size: 0.9rem; pointer-events: none; }
+
+/* ── SCROLL BODY ── */
+.screen-body {
+  flex: 1; overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  padding-bottom: calc(16px + var(--safe-bottom));
+}
+
+/* ── SETUP SCREEN ── */
+#screenSetup {
+  align-items: center; justify-content: center;
+  padding: 32px 28px;
+  text-align: center;
+  gap: 0;
+}
+.setup-icon { font-size: 3.5rem; margin-bottom: 18px; }
+.setup-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.8rem; letter-spacing: 1.5px;
+  color: var(--ink); margin-bottom: 10px;
+}
+.setup-desc {
+  font-size: 0.88rem; color: var(--muted);
+  line-height: 1.6; margin-bottom: 28px;
+}
+.setup-steps {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  text-align: left;
+  margin-bottom: 28px;
+  width: 100%;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+}
+.setup-step {
+  display: flex; gap: 12px; align-items: flex-start;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(200,169,110,0.15);
+}
+.setup-step:last-child { border-bottom: none; }
+.step-num {
+  width: 24px; height: 24px; border-radius: 50%;
+  background: var(--ink); color: var(--wood);
+  font-family: 'Bebas Neue', sans-serif; font-size: 0.9rem;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: 1px;
+}
+.step-text { font-size: 0.85rem; line-height: 1.5; color: var(--ink); }
+.step-text strong { color: var(--wood-dark); }
+
+.btn-primary {
+  width: 100%; padding: 15px;
+  background: var(--ink); color: var(--wood);
+  border: none; border-radius: var(--radius);
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 1.2rem; letter-spacing: 1.5px;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+  transition: opacity 0.15s;
+}
+.btn-primary:active { opacity: 0.8; }
+
+/* ── STATUS BAR (top of home/detail) ── */
+.status-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 16px 0;
+}
+.status-pill {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--card); border-radius: 20px;
+  padding: 5px 12px;
+  font-size: 0.7rem; color: var(--muted);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+.status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+.status-dot.stale { background: #c8a020; }
+.refresh-btn {
+  background: var(--ink); color: var(--wood);
+  border: none; border-radius: 20px;
+  padding: 6px 14px;
+  font-family: 'Sarabun', sans-serif;
+  font-size: 0.72rem; font-weight: 600;
+  cursor: pointer; transition: opacity 0.15s;
+  display: flex; align-items: center; gap: 5px;
+}
+.refresh-btn:active { opacity: 0.75; }
+.refresh-btn.spinning .spin { display: inline-block; animation: spin 0.8s linear infinite; }
+.spin { display: inline-block; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── HOME CARDS ── */
+.home-label {
+  padding: 12px 16px 8px;
+  font-size: 0.65rem; text-transform: uppercase;
+  letter-spacing: 1.8px; color: var(--muted); font-weight: 700;
+}
+.cards-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 10px; padding: 0 14px 8px;
+}
+.wood-card {
+  background: var(--card); border-radius: var(--radius);
+  padding: 14px 12px 12px; cursor: pointer;
+  border-left: 4px solid var(--wood);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+  transition: transform 0.15s;
+  animation: fadeUp 0.28s ease both;
+  position: relative; overflow: hidden;
+  -webkit-user-select: none; user-select: none;
+}
+.wood-card::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, transparent 55%, rgba(200,169,110,0.07));
+  pointer-events: none;
+}
+.wood-card:active { transform: scale(0.96); }
+.card-code { font-family: 'Bebas Neue', sans-serif; font-size: 1.45rem; letter-spacing: 1px; line-height: 1; }
+.card-desc { font-size: 0.68rem; color: var(--muted); margin-top: 4px; line-height: 1.35; min-height: 2.1em; }
+.card-rates { margin-top: 8px; display: flex; flex-direction: column; gap: 3px; }
+.rate-pill {
+  font-size: 0.62rem; font-weight: 600; padding: 2px 7px;
+  border-radius: 20px; width: fit-content;
+}
+.pill-p { background: rgba(26,18,9,0.07); color: var(--ink); }
+.pill-g { background: rgba(45,106,63,0.1); color: var(--accent); }
+.card-arrow { position: absolute; bottom: 10px; right: 10px; font-size: 0.85rem; color: var(--wood); opacity: 0.55; }
+
+/* ── DETAIL ── */
+.selector-wrap { padding: 12px 14px 0; }
+.wood-selector {
+  width: 100%; padding: 11px 36px 11px 14px;
+  border-radius: 12px; border: 1.5px solid rgba(200,169,110,0.3);
+  background: var(--card);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237a5c10' stroke-width='2' stroke-linecap='round' fill='none'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 14px center;
+  font-family: 'Sarabun', sans-serif; font-size: 0.95rem; color: var(--ink);
+  appearance: none; outline: none;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05); cursor: pointer;
+}
+.tabs { display: flex; gap: 6px; padding: 10px 14px 0; }
+.tab {
+  flex: 1; padding: 8px 5px 7px;
+  border-radius: 12px 12px 0 0; border: none;
+  font-family: 'Sarabun', sans-serif; font-size: 0.77rem; font-weight: 600;
+  cursor: pointer; background: rgba(200,169,110,0.1); color: var(--muted);
+  border-bottom: 3px solid transparent; transition: all 0.18s;
+  -webkit-user-select: none; user-select: none;
+}
+.tab.active { background: var(--card); color: var(--ink); border-bottom-color: var(--wood-dark); }
+.tab-rate { display: block; font-size: 0.6rem; font-weight: 300; margin-top: 1px; opacity: 0.75; }
+.tab.active .tab-rate { color: var(--accent); opacity: 1; }
+
+.size-search { padding: 8px 14px 0; position: relative; }
+.size-search input {
+  width: 100%; padding: 9px 14px 9px 36px;
+  border-radius: 10px; border: 1.5px solid rgba(200,169,110,0.22);
+  background: var(--card); font-family: 'Sarabun', sans-serif;
+  font-size: 0.9rem; color: var(--ink); outline: none;
+  transition: border-color 0.2s; box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+.size-search input:focus { border-color: var(--wood); }
+
+/* ── PRICE LIST ── */
+.price-list { padding: 6px 14px 0; }
+.list-label {
+  font-size: 0.63rem; text-transform: uppercase;
+  letter-spacing: 1.5px; color: var(--muted);
+  padding: 10px 2px 6px; font-weight: 700;
+}
+.price-item {
+  background: var(--card); border-radius: var(--radius);
+  margin-bottom: 7px; display: flex; align-items: stretch;
+  overflow: hidden; box-shadow: 0 1px 5px rgba(0,0,0,0.06);
+  animation: fadeUp 0.2s ease both;
+}
+.price-item:active { opacity: 0.82; }
+.size-badge {
+  background: var(--ink); color: var(--wood);
+  font-family: 'Bebas Neue', sans-serif; font-size: 1.25rem; letter-spacing: 1px;
+  padding: 0 14px; min-width: 66px; text-align: center;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.price-cols { flex: 1; display: flex; }
+.price-col { flex: 1; padding: 11px 12px; display: flex; flex-direction: column; gap: 2px; }
+.price-col + .price-col { border-left: 1px solid rgba(200,169,110,0.2); }
+.col-lbl { font-size: 0.58rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+.col-price { font-size: 1.2rem; font-weight: 700; letter-spacing: -0.5px; }
+.col-price .u { font-size: 0.63rem; font-weight: 400; color: var(--muted); margin-left: 1px; }
+.col-diff { font-size: 0.58rem; font-weight: 700; color: var(--accent); background: rgba(45,106,63,0.1); padding: 1px 5px; border-radius: 4px; width: fit-content; margin-top: 2px; }
+.price-item.single .price-col { padding: 14px 16px; }
+.price-item.single .col-price { font-size: 1.5rem; }
+
+.empty-msg { text-align: center; color: var(--muted); padding: 48px 20px; font-size: 0.88rem; }
+.no-cards { grid-column: 1/-1; text-align: center; color: var(--muted); padding: 40px 20px; font-size: 0.88rem; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(7px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── ERROR TOAST ── */
+.toast {
+  position: fixed; bottom: calc(20px + var(--safe-bottom)); left: 50%;
+  transform: translateX(-50%);
+  background: #5a1a0a; color: #fde0d0;
+  padding: 10px 18px; border-radius: 10px;
+  font-size: 0.82rem; max-width: 85vw; text-align: center;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+  animation: fadeUp 0.2s ease;
+  z-index: 99;
+}
+</style>
+</head>
+<body>
+
+<!-- ══ SETUP SCREEN ══ -->
+<div class="screen" id="screenSetup">
+  <div class="setup-icon">🪵</div>
+  <div class="setup-title">ตั้งค่าครั้งแรก</div>
+  <div class="setup-desc">เลือกโฟลเดอร์ที่เก็บไฟล์ <strong>prices.json</strong><br>แอปจะจำโฟลเดอร์นี้ไว้และอ่านราคาจากโฟลเดอร์นั้นเสมอ</div>
+
+  <div class="setup-steps">
+    <div class="setup-step">
+      <div class="step-num">1</div>
+      <div class="step-text">รับไฟล์ <strong>prices.json</strong> จาก LINE แล้วบันทึกลงโทรศัพท์</div>
+    </div>
+    <div class="setup-step">
+      <div class="step-num">2</div>
+      <div class="step-text">กดปุ่มด้านล่าง แล้ว<strong>เลือกโฟลเดอร์</strong>ที่บันทึกไฟล์ไว้</div>
+    </div>
+    <div class="setup-step">
+      <div class="step-num">3</div>
+      <div class="step-text">แอปจะโหลดราคาทันที ครั้งต่อไปกดแค่ <strong>Refresh</strong> หลังได้รับไฟล์ใหม่</div>
+    </div>
+  </div>
+
+  <button class="btn-primary" onclick="pickFolder()">📁 เลือกโฟลเดอร์ prices.json</button>
+</div>
+
+<!-- ══ HOME SCREEN ══ -->
+<div class="screen slide-right" id="screenHome">
+  <div class="app-header">
+    <div class="header-row">
+      <div class="header-text">
+        <div class="header-brand">กรอบรูป</div>
+        <div class="header-sub">ตารางราคาไม้กรอบรูป</div>
+      </div>
+    </div>
+    <div class="search-wrap">
+      <span class="s-icon">🔍</span>
+      <input type="search" id="homeSearch" placeholder="ค้นหาประเภทไม้…" autocomplete="off" oninput="filterCards()">
+    </div>
+  </div>
+
+  <div class="screen-body">
+    <div class="status-bar">
+      <div class="status-pill">
+        <div class="status-dot" id="statusDot"></div>
+        <span id="statusText">โหลดแล้ว</span>
+      </div>
+      <button class="refresh-btn" id="refreshBtn" onclick="refreshPrices()">
+        <span class="spin">↻</span> อัปเดตราคา
+      </button>
+    </div>
+    <div class="home-label">ประเภทไม้ทั้งหมด</div>
+    <div class="cards-grid" id="cardsGrid"></div>
+  </div>
+</div>
+
+<!-- ══ DETAIL SCREEN ══ -->
+<div class="screen slide-right" id="screenDetail">
+  <div class="app-header">
+    <div class="header-row">
+      <button class="back-btn" onclick="goBack()">←</button>
+      <div class="header-text">
+        <div class="header-brand" id="detailTitle">—</div>
+        <div class="header-sub" id="detailSub">—</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen-body">
+    <div class="selector-wrap">
+      <select class="wood-selector" id="woodSelector" onchange="switchWood(this.value)"></select>
+    </div>
+    <div class="tabs">
+      <button class="tab active" id="tab-both"  onclick="setView('both')">เปรียบเทียบ<span class="tab-rate" id="rateCompare">—</span></button>
+      <button class="tab"        id="tab-plain" onclick="setView('plain')">ธรรมดา<span class="tab-rate" id="ratePlain">—</span></button>
+      <button class="tab"        id="tab-groove"onclick="setView('groove')">ใส่ฝ้าย<span class="tab-rate" id="rateGroove">—</span></button>
+    </div>
+    <div class="size-search">
+      <span class="s-icon" style="left:26px">🔍</span>
+      <input type="search" id="sizeSearch" placeholder="ค้นหาขนาด เช่น 4x6, A4…" autocomplete="off" oninput="renderPrices()">
+    </div>
+    <div class="price-list" id="priceList"></div>
+  </div>
+</div>
+
+<script>
+// ── State ──────────────────────────────────────────────────────────
+let woodData   = null;
+let currentWood = null;
+let viewMode   = 'both';
+let dirHandle  = null;   // FileSystemDirectoryHandle
+let updatedDate = '';
+
+const DB_NAME   = 'wood-price-db';
+const DB_STORE  = 'handles';
+const HANDLE_KEY = 'pricesDir';
+const DATA_KEY   = 'cachedPrices';
+
+const cardAccents = ['#c8a96e','#7a5c10','#2d6a3f','#b84a1a','#4a6e8a',
+                     '#7a4d6e','#c8a96e','#5a7a3a','#8a6040','#4a8a7a','#8a7a40'];
+
+// ── IndexedDB helpers ───────────────────────────────────────────────
+function openDB() {
+  return new Promise((res, rej) => {
+    const req = indexedDB.open(DB_NAME, 1);
+    req.onupgradeneeded = e => e.target.result.createObjectStore(DB_STORE);
+    req.onsuccess = e => res(e.target.result);
+    req.onerror   = e => rej(e.target.error);
+  });
+}
+
+async function dbGet(key) {
+  const db = await openDB();
+  return new Promise((res, rej) => {
+    const tx  = db.transaction(DB_STORE, 'readonly');
+    const req = tx.objectStore(DB_STORE).get(key);
+    req.onsuccess = e => res(e.target.result);
+    req.onerror   = e => rej(e.target.error);
+  });
+}
+
+async function dbSet(key, value) {
+  const db = await openDB();
+  return new Promise((res, rej) => {
+    const tx  = db.transaction(DB_STORE, 'readwrite');
+    const req = tx.objectStore(DB_STORE).put(value, key);
+    req.onsuccess = () => res();
+    req.onerror   = e => rej(e.target.error);
+  });
+}
+
+// ── File System Access ──────────────────────────────────────────────
+async function pickFolder() {
+  if (!('showDirectoryPicker' in window)) {
+    showToast('เบราว์เซอร์นี้ไม่รองรับการเลือกโฟลเดอร์\nใช้ Chrome บน Android แทน');
+    return;
+  }
+  try {
+    const handle = await window.showDirectoryPicker({ mode: 'read' });
+    await dbSet(HANDLE_KEY, handle);
+    dirHandle = handle;
+    await loadFromDir(handle);
+  } catch (e) {
+    if (e.name !== 'AbortError') showToast('ไม่สามารถเข้าถึงโฟลเดอร์ได้');
+  }
+}
+
+async function readPricesJson(handle) {
+  // Verify permission
+  const perm = await handle.queryPermission({ mode: 'read' });
+  if (perm !== 'granted') {
+    const req = await handle.requestPermission({ mode: 'read' });
+    if (req !== 'granted') throw new Error('ไม่ได้รับอนุญาต');
+  }
+  const fileHandle = await handle.getFileHandle('prices.json');
+  const file = await fileHandle.getFile();
+  const text = await file.text();
+  return JSON.parse(text);
+}
+
+async function loadFromDir(handle) {
+  try {
+    const json = await readPricesJson(handle);
+    woodData    = json.woods;
+    updatedDate = json.updated || '';
+    await dbSet(DATA_KEY, json);  // cache locally
+    showHome();
+  } catch (e) {
+    if (e.message.includes('prices.json') || e.name === 'NotFoundError') {
+      showToast('ไม่พบ prices.json ในโฟลเดอร์นี้\nตรวจสอบว่าวางไฟล์ไว้ถูกที่แล้วหรือยัง');
+    } else {
+      showToast('โหลดข้อมูลไม่สำเร็จ: ' + e.message);
+    }
+  }
+}
+
+async function refreshPrices() {
+  if (!dirHandle) { showToast('ยังไม่ได้เลือกโฟลเดอร์'); return; }
+  const btn = document.getElementById('refreshBtn');
+  btn.classList.add('spinning');
+  btn.disabled = true;
+  try {
+    const json = await readPricesJson(dirHandle);
+    woodData    = json.woods;
+    updatedDate = json.updated || '';
+    await dbSet(DATA_KEY, json);
+    updateStatus(true);
+    renderCards(document.getElementById('homeSearch').value.toLowerCase().trim());
+    // If detail open, re-render it too
+    if (currentWood && woodData[currentWood]) renderPrices();
+    showToast('✓ อัปเดตราคาเรียบร้อย');
+  } catch (e) {
+    showToast('ไม่พบ prices.json — วางไฟล์ใหม่แล้วลองอีกครั้ง');
+  } finally {
+    btn.classList.remove('spinning');
+    btn.disabled = false;
+  }
+}
+
+// ── Boot ────────────────────────────────────────────────────────────
+async function boot() {
+  // Try to restore saved dir handle + cached data
+  const [savedHandle, cachedData] = await Promise.all([
+    dbGet(HANDLE_KEY).catch(() => null),
+    dbGet(DATA_KEY).catch(() => null)
+  ]);
+
+  if (cachedData) {
+    // Show cached data immediately
+    woodData    = cachedData.woods;
+    updatedDate = cachedData.updated || '';
+    dirHandle   = savedHandle || null;
+    showHome();
+
+    // Then silently try to refresh from dir in background
+    if (savedHandle) {
+      try {
+        const perm = await savedHandle.queryPermission({ mode: 'read' });
+        if (perm === 'granted') {
+          dirHandle = savedHandle;
+          const fresh = await readPricesJson(savedHandle);
+          woodData    = fresh.woods;
+          updatedDate = fresh.updated || '';
+          await dbSet(DATA_KEY, fresh);
+          updateStatus(true);
+          renderCards('');
+        }
+      } catch (_) { /* silent — use cached */ }
+    }
+  } else if (savedHandle) {
+    dirHandle = savedHandle;
+    await loadFromDir(savedHandle);
+  } else {
+    show('screenSetup');
+  }
+}
+
+// ── Navigation ──────────────────────────────────────────────────────
+function show(id) {
+  ['screenSetup','screenHome','screenDetail'].forEach(s => {
+    const el = document.getElementById(s);
+    el.classList.remove('slide-right','slide-left');
+    if (s !== id) el.classList.add('slide-right');
+  });
+}
+
+function showHome() {
+  show('screenHome');
+  buildSelector();
+  updateStatus(true);
+  renderCards('');
+}
+
+function updateStatus(ok) {
+  const dot  = document.getElementById('statusDot');
+  const text = document.getElementById('statusText');
+  dot.className  = 'status-dot' + (ok ? '' : ' stale');
+  text.textContent = updatedDate ? `อัปเดต ${updatedDate}` : 'โหลดแล้ว';
+}
+
+function buildSelector() {
+  const sel = document.getElementById('woodSelector');
+  sel.innerHTML = Object.keys(woodData).map(k =>
+    `<option value="${k}">${k} — ${woodData[k].description}</option>`
+  ).join('');
+}
+
+function openWood(key) {
+  currentWood = key;
+  viewMode    = 'both';
+  document.getElementById('woodSelector').value = key;
+  document.getElementById('sizeSearch').value   = '';
+  updateDetailHeader();
+  setView('both');
+
+  history.pushState({ screen: 'detail', wood: key }, '', '#detail');
+
+  document.getElementById('screenHome').classList.add('slide-left');
+  document.getElementById('screenDetail').classList.remove('slide-right');
+  document.querySelector('#screenDetail .screen-body').scrollTop = 0;
+}
+
+function goBack() { history.back(); }
+
+function returnHome() {
+  document.getElementById('screenDetail').classList.add('slide-right');
+  document.getElementById('screenHome').classList.remove('slide-left');
+  document.getElementById('homeSearch').value = '';
+  renderCards('');
+}
+
+window.addEventListener('popstate', e => {
+  if (!e.state || e.state.screen !== 'detail') returnHome();
+});
+
+function switchWood(key) {
+  currentWood = key;
+  document.getElementById('sizeSearch').value = '';
+  updateDetailHeader();
+  renderPrices();
+  history.replaceState({ screen: 'detail', wood: key }, '', '#detail');
+}
+
+// ── Cards ───────────────────────────────────────────────────────────
+function filterCards() {
+  renderCards(document.getElementById('homeSearch').value.toLowerCase().trim());
+}
+
+function renderCards(q) {
+  const grid = document.getElementById('cardsGrid');
+  const keys = Object.keys(woodData).filter(k =>
+    !q || k.toLowerCase().includes(q) || woodData[k].description.toLowerCase().includes(q)
+  );
+  if (!keys.length) {
+    grid.innerHTML = '<div class="no-cards">ไม่พบประเภทไม้ที่ค้นหา 🪵</div>';
+    return;
+  }
+  grid.innerHTML = keys.map((k, i) => {
+    const d = woodData[k];
+    return `
+      <div class="wood-card" style="border-left-color:${cardAccents[i%cardAccents.length]};animation-delay:${i*0.032}s" onclick="openWood('${k}')">
+        <div class="card-code">${k}</div>
+        <div class="card-desc">${d.description}</div>
+        <div class="card-rates">
+          <div class="rate-pill pill-p">ธรรมดา ${d.perInchPlain.toFixed(2)} บาท/นิ้ว</div>
+          <div class="rate-pill pill-g">ฝ้าย ${d.perInchGroove.toFixed(2)} บาท/นิ้ว</div>
+        </div>
+        <div class="card-arrow">›</div>
+      </div>`;
+  }).join('');
+}
+
+// ── Detail ──────────────────────────────────────────────────────────
+function updateDetailHeader() {
+  const d = woodData[currentWood];
+  document.getElementById('detailTitle').textContent = currentWood;
+  document.getElementById('detailSub').textContent   = d.description;
+  document.getElementById('rateCompare').textContent = `${d.perInchPlain.toFixed(2)} / ${d.perInchGroove.toFixed(2)} บาท/นิ้ว`;
+  document.getElementById('ratePlain').textContent   = `${d.perInchPlain.toFixed(2)} บาท/นิ้ว`;
+  document.getElementById('rateGroove').textContent  = `${d.perInchGroove.toFixed(2)} บาท/นิ้ว`;
+}
+
+function setView(mode) {
+  viewMode = mode;
+  ['both','plain','groove'].forEach(m =>
+    document.getElementById('tab-'+m).classList.toggle('active', m === mode)
+  );
+  renderPrices();
+}
+
+function renderPrices() {
+  if (!currentWood) return;
+  const d = woodData[currentWood];
+  const q = document.getElementById('sizeSearch').value.toLowerCase().trim();
+  const rows = d.sizes.filter(s => !q || s.size.toLowerCase().includes(q));
+  const list = document.getElementById('priceList');
+
+  if (!rows.length) { list.innerHTML = '<div class="empty-msg">ไม่พบขนาดที่ค้นหา 🪵</div>'; return; }
+
+  let html = '';
+  if (viewMode === 'both') {
+    html += `<div class="list-label">${currentWood} — ธรรมดา vs ${d.grooveLabel}</div>`;
+    rows.forEach((s, i) => {
+      const diff = Math.round(s.groove - s.plain);
+      html += `
+        <div class="price-item" style="animation-delay:${i*0.018}s">
+          <div class="size-badge">${s.size}</div>
+          <div class="price-cols">
+            <div class="price-col">
+              <div class="col-lbl">ธรรมดา</div>
+              <div class="col-price">${Math.round(s.plain)}<span class="u"> บาท</span></div>
+            </div>
+            <div class="price-col">
+              <div class="col-lbl">${d.grooveLabel}</div>
+              <div class="col-price">${Math.round(s.groove)}<span class="u"> บาท</span></div>
+              <div class="col-diff">+${diff} บาท</div>
+            </div>
+          </div>
+        </div>`;
+    });
+  } else {
+    const isPlain = viewMode === 'plain';
+    const label   = isPlain ? `${currentWood} ธรรมดา` : `${currentWood} ${d.grooveLabel}`;
+    const rate    = isPlain ? d.perInchPlain : d.perInchGroove;
+    html += `<div class="list-label">${label} — ${rate.toFixed(2)} บาท/นิ้ว</div>`;
+    rows.forEach((s, i) => {
+      const price = Math.round(isPlain ? s.plain : s.groove);
+      html += `
+        <div class="price-item single" style="animation-delay:${i*0.018}s">
+          <div class="size-badge">${s.size}</div>
+          <div class="price-cols">
+            <div class="price-col">
+              <div class="col-lbl">${label}</div>
+              <div class="col-price">${price}<span class="u">บาท</span></div>
+            </div>
+          </div>
+        </div>`;
+    });
+  }
+  list.innerHTML = html;
+}
+
+// ── Toast ────────────────────────────────────────────────────────────
+let toastTimer = null;
+function showToast(msg) {
+  const existing = document.querySelector('.toast');
+  if (existing) existing.remove();
+  clearTimeout(toastTimer);
+  const el = document.createElement('div');
+  el.className   = 'toast';
+  el.textContent = msg;
+  document.body.appendChild(el);
+  toastTimer = setTimeout(() => el.remove(), 3000);
+}
+
+// ── Service Worker ───────────────────────────────────────────────────
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
+}
+
+if (location.hash === '#detail') history.replaceState({}, '', './');
+
+boot();
+</script>
+</body>
+</html>

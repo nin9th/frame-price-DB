@@ -669,7 +669,8 @@ function renderPrices() {
   if (!currentWood) return;
   const d = woodData[currentWood];
   const q = document.getElementById('sizeSearch').value.toLowerCase().trim();
-  const rows = d.sizes.filter(s => !q || s.size.toLowerCase().includes(q));
+  const normalize = str => str.toLowerCase().replace(/[*×xX ]/g, 'x');
+  const rows = d.sizes.filter(s => !q || normalize(s.size).includes(normalize(q)));
   const list = document.getElementById('priceList');
 
   if (!rows.length) { list.innerHTML = '<div class="empty-msg">ไม่พบขนาดที่ค้นหา 🪵</div>'; return; }

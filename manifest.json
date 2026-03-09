@@ -1,7 +1,7 @@
 {
-  "name": "ราคากรอบไม้",
-  "short_name": "กรอบไม้",
-  "description": "ตารางราคากรอบไม้ทุกประเภท",
+  "name": "ราคากรอบรูป",
+  "short_name": "ราคากรอบ",
+  "description": "ตารางราคากรอบทุกประเภท",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#1a1209",

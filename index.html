@@ -353,12 +353,15 @@ body {
     <div class="status-bar">
       <div class="status-pill">
         <div class="status-dot" id="statusDot"></div>
-        <span id="statusText">โหลดแล้ว</span>
-      </div>
-      <button class="refresh-btn" id="refreshBtn" onclick="refreshPrices()">
-        <span class="spin">↻</span> อัปเดตราคา
-      </button>
-    </div>
+      <span id="statusText">โหลดแล้ว</span>
+  </div>
+  <div style="display:flex;gap:6px">
+    <button class="refresh-btn" style="background:rgba(26,18,9,0.12);color:var(--muted)" onclick="changeFolder()" title="เปลี่ยนโฟลเดอร์">📁</button>
+    <button class="refresh-btn" id="refreshBtn" onclick="refreshPrices()">
+      <span class="spin">↻</span> อัปเดตราคา
+    </button>
+  </div>
+</div>
     <div class="home-label">ประเภทไม้ทั้งหมด</div>
     <div class="cards-grid" id="cardsGrid"></div>
   </div>
@@ -440,6 +443,9 @@ async function dbSet(key, value) {
 }
 
 // ── File System Access ──────────────────────────────────────────────
+async function changeFolder() {
+  await pickFolder();
+}  
 async function pickFolder() {
   if (!('showDirectoryPicker' in window)) {
     showToast('เบราว์เซอร์นี้ไม่รองรับการเลือกโฟลเดอร์\nใช้ Chrome บน Android แทน');
